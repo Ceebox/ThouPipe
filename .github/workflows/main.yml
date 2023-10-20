@@ -14,5 +14,7 @@ jobs:
           user-name: "ceebox"
           message: "Automatically built unbuilt typescript"
           directories: ./, /home/runner/work/ThouPipe/ThouPipe
+      - name: Commit
+        run: git add . -f; git commit -m Automatically built unbuilt typescript 
         env:
           GITHUB_TOKEN: ${{ github.token }}
