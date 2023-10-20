@@ -13,4 +13,4 @@ jobs:
           user-name: ""
           user-email: ""
           message: "Automatically built unbuilt typescript"
-          directories: ./
+          directories: ./ThouPipe/
