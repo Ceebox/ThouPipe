@@ -2,8 +2,8 @@ on: [push]
 
 jobs:
   build-push:
-    runs-on: ubuntu-latest
     name: Builds Typescript
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
@@ -25,6 +25,10 @@ jobs:
   pre-release:
     name: "Pre Release"
     runs-on: "ubuntu-latest"
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
 
     steps:
       # ...
