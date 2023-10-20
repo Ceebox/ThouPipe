@@ -89,9 +89,10 @@ export class Window {
             // Get video file from files input.
             this.videoFile = this.getFirstFileWithTerms(input.files, this.FILETYPES);
             if (this.videoFile === null) {
+                // Recreate input field.
+                input = document.createElement('input');
                 // Give up.
                 console.error("Could not find a matching video file.");
-                input = document.createElement('input');
                 return;
             }
 
@@ -290,8 +291,6 @@ export class Window {
     }
 
     private onTimeChanged(): void {
-
-        console.log(this.video.currentTime);
 
         if (this.video.paused) {
             return;
