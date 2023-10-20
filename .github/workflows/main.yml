@@ -10,6 +10,8 @@ jobs:
       - name: Building Typescript
         uses: FuLagann/tsc-build-push@v1
         with:
+          email: "chadderboxdev@gmail.com"
+          username: "ceebox"
           message: "Automatically built unbuilt typescript"
           directories: ./
         env:
