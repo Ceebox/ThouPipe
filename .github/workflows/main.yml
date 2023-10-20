@@ -2,8 +2,10 @@ on: [push]
 
 jobs:
   build-push:
-    runs-on: ubuntu-latest
     name: Builds Typescript
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -13,6 +15,34 @@ jobs:
           user-email: "chadderboxdev@gmail.com"
           user-name: "ceebox"
           message: "Automatically built unbuilt typescript"
-          directories: ./
+          directories: ./, /home/runner/work/ThouPipe/ThouPipe
         env:
           GITHUB_TOKEN: ${{ github.token }}
+      - name: Commit
+        run: git add . -f; git commit -m "Automatically built unbuilt typescript."; git push;
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+  pre-release:
+    name: "Pre Release"
+    runs-on: "ubuntu-latest"
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+
+    steps:
+      # ...
+      - name: "Build & test"
+        run: |
+          echo "Done!"
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            LICENSE.txt
+            *.html
+            *.js
