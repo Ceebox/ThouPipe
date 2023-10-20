@@ -13,6 +13,7 @@ I hope someone else one day has a use for this, but for now it is just going to 
  - Bang!
 
 **Some more information:**
+
 When you open the `index.html` or embed the build JavaScript into a website, it will create a small file input. You can add your video file to this, but also a .JSON file. This JSON file can contain times where the video will automatically pause, so you can present and then resume when you are done.
 
 **Keybinds:**
