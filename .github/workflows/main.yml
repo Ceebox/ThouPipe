@@ -10,7 +10,9 @@ jobs:
       - name: Building Typescript
         uses: FuLagann/tsc-build-push@v1
         with:
-          user-name: "John Doe"
-          user-email: "john.doe@example.com"
+          user-email: "chadderboxdev@gmail.com"
+          user-name: "ceebox"
           message: "Automatically built unbuilt typescript"
           directories: ./
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
