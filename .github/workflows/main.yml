@@ -4,6 +4,8 @@ jobs:
   build-push:
     runs-on: ubuntu-latest
     name: Builds Typescript
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -14,6 +16,8 @@ jobs:
           user-name: "ceebox"
           message: "Automatically built unbuilt typescript"
           directories: ./, /home/runner/work/ThouPipe/ThouPipe
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Commit
         run: git add . -f; git commit -m "Automatically built unbuilt typescript."; git push;
         env:
