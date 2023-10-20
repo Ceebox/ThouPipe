@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "module": "ES6",
+      "removeComments": true,
+      "outDir": "./build/",
+      "sourceMap": true,
+    },
+    "include": ["./src/**/*"],
+}
