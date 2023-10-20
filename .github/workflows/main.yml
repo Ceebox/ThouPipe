@@ -13,6 +13,6 @@ jobs:
           user-email: "chadderboxdev@gmail.com"
           user-name: "ceebox"
           message: "Automatically built unbuilt typescript"
-          directories: ./
+          directories: ./, ./ThouPipe/
         env:
           GITHUB_TOKEN: ${{ github.token }}
