@@ -220,22 +220,48 @@ export class Window {
 
         // Add a pause spot.
         document.body.addEventListener('keydown', (e) => {
-            if ((e as KeyboardEvent).key === "k") {
+            if ((e as KeyboardEvent).key === "t") {
                 this.addTimeData(this.video.currentTime);
+            }
+        });
+
+        // Download all pause time information.
+        document.body.addEventListener('keydown', (e) => {
+            if ((e as KeyboardEvent).key === "t") {
+                this.downloadTimeData();
             }
         });
     }
 
     private addTimeData(newTime): void {
 
+        // Add new data to array
         const newTimeData: TimeData = { time: newTime };
         this.timeData.push(newTimeData);
 
+        // Re-sort the array (lowest => highest)
         this.timeData.sort((a, b) => a.time - b.time);
         this.recalculateTimeIndex();
 
         // Increment the time index so we don't hit it as soon as we keep going.
         this.timeIndex++;
+    }
+
+    private downloadTimeData(): void {
+
+        // Turn time data into JSON we can use.
+        const serialised = JSON.stringify(this.timeData);
+        
+        // Create file.
+        const downloadJSON = new File(["\ufeff"+serialised], this.videoFile.name.replace(".mp4", "") + ".json", {type: "text/plain:charset=UTF-8"});
+
+        // Create hidden element to download the file.
+        const downloadURL = window.URL.createObjectURL(downloadJSON);
+        const downloadElement = document.createElement("a");
+        downloadElement.href = downloadURL;
+        downloadElement.download = this.videoFile.name.replace(".mp4", "") + ".json";
+        downloadElement.click();
+        window.URL.revokeObjectURL(downloadURL);
     }
 
     private skipBack(): void {

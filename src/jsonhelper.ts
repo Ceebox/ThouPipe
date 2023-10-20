@@ -7,8 +7,8 @@ export class JSONHelper {
 
         // Read JSON and push it to the array
         const json = JSON.parse(jsonData);
-        json.pauseTimes.forEach(timeValue => {
-            let time: TimeData = { time: timeValue };
+        json.forEach(time => {
+            let timeData: TimeData = { time: time };
             data.push(time);
         });
 
