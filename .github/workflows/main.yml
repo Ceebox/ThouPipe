@@ -13,4 +13,4 @@ jobs:
           user-name: "John Doe"
           user-email: "john.doe@example.com"
           message: "Automatically built unbuilt typescript"
-          directories: ./
+          directories: ./src/
