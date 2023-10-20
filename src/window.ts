@@ -1,9 +1,10 @@
+import { Input } from "./input.js";
 import { JSONHelper } from "./jsonhelper.js";
 
 export class Window {
 
     // [File stuff]
-    FILETYPES = [".mp4", ".mpeg"]
+    private FILETYPES = [".mp4", ".mpeg"]
     private videoFile: File;
     // Time data JSON
     private timeDataFile: File;
@@ -37,15 +38,6 @@ export class Window {
         }
     }
 
-    public pause(): void {
-
-        if (this.video === undefined || this.video.duration === Number.NaN) {
-            return;
-        }
-
-        this.video.pause();
-    }
-
     public play(): void {
 
         if (this.video === undefined || this.video.duration === Number.NaN) {
@@ -53,6 +45,15 @@ export class Window {
         }
 
         this.video.play();
+    }
+
+    public pause(): void {
+
+        if (this.video === undefined || this.video.duration === Number.NaN) {
+            return;
+        }
+
+        this.video.pause();
     }
 
     public toggleMute(): void {
@@ -64,13 +65,45 @@ export class Window {
         this.video.muted = !this.video.muted;
     }
 
-    public seekTime(time: number): void {
+    public skipBack(): void {
+
+        this.seekTime(this.video.currentTime - 1);
+    }
+
+    public skipForward(): void {
+
+        this.seekTime(this.video.currentTime + 1);
+    }
+
+    public addPausePoint(): void {
+        this.addTimeData(this.video.currentTime);
+    }
+
+    public downloadTimeData(): void {
+
+        // Turn time data into JSON we can use.
+        const serialised = JSON.stringify(this.timeData);
+        
+        // Create file.
+        const downloadJSON = new File(["\ufeff"+serialised], this.videoFile.name.replace(".mp4", "") + ".json", {type: "text/plain:charset=UTF-8"});
+
+        // Create hidden element to download the file.
+        const downloadURL = window.URL.createObjectURL(downloadJSON);
+        const downloadElement = document.createElement("a");
+        downloadElement.href = downloadURL;
+        downloadElement.download = this.videoFile.name.replace(".mp4", "") + ".json";
+        downloadElement.click();
+        window.URL.revokeObjectURL(downloadURL);
+    }
+
+    private seekTime(time: number): void {
 
         if (this.video === undefined || this.video.duration === Number.NaN) {
             return;
         }
 
         this.video.currentTime = time;
+        this.recalculateTimeIndex();
     }
 
     private getFiles() {
@@ -120,32 +153,6 @@ export class Window {
         document.getElementsByTagName("body")[0].appendChild(input);
     }
 
-    private getFirstFileWithTerms(list: FileList, terms: string[]) : File {
-
-        // Check if a term exists within any of the files
-        for (let i = 0; i < list.length; i++) {
-            for (let t = 0; t < terms.length; t++) {
-                if (list[i].name.split(terms[t]).length > 1) {
-                    return list[i];
-                }
-            }           
-        }
-
-        return null;
-    }
-
-    private getFirstFileWithTerm(list: FileList, term: string) : File {
-
-        // Check if a term exists within any of the files
-        for (let i = 0; i < list.length; i++) {
-            if (list[i].name.split(term).length > 1) {
-                return list[i];
-            } 
-        }
-
-        return null;
-    }
-
     private createWindow() {
 
         this.video = document.createElement('video');
@@ -177,7 +184,35 @@ export class Window {
         // Event listeners.
         this.video.ontimeupdate = () => { this.onTimeChanged(); };
         addEventListener("resize", () => { this.setVideoSize(); });
-        this.registerKeybinds();
+
+        const input = new Input(this);
+        input.registerKeybinds();
+    }
+
+    private getFirstFileWithTerms(list: FileList, terms: string[]) : File {
+
+        // Check if a term exists within any of the files
+        for (let i = 0; i < list.length; i++) {
+            for (let t = 0; t < terms.length; t++) {
+                if (list[i].name.split(terms[t]).length > 1) {
+                    return list[i];
+                }
+            }           
+        }
+
+        return null;
+    }
+
+    private getFirstFileWithTerm(list: FileList, term: string) : File {
+
+        // Check if a term exists within any of the files
+        for (let i = 0; i < list.length; i++) {
+            if (list[i].name.split(term).length > 1) {
+                return list[i];
+            } 
+        }
+
+        return null;
     }
 
     private hideScrollBars(): void {
@@ -187,51 +222,6 @@ export class Window {
     private setVideoSize(): void {
         this.video.width = document.body.clientWidth;
         this.video.height = document.body.clientHeight;
-    }
-
-    private registerKeybinds(): void {
-
-        // Play/Pause the video.
-        document.body.addEventListener('keydown', (e) => {
-            if ((e as KeyboardEvent).key === "Enter") {
-                this.togglePause();
-            }
-        });
-
-        // Move back 1 second.
-        document.body.addEventListener('keydown', (e) => {
-            if ((e as KeyboardEvent).key === "ArrowLeft") {
-                this.skipBack();
-            }
-        });
-
-        // Skip forward 1 second.
-        document.body.addEventListener('keydown', (e) => {
-            if ((e as KeyboardEvent).key === "ArrowRight") {
-                this.skipForward();
-            }
-        });
-
-        // Mute/Unmute the video.
-        document.body.addEventListener('keydown', (e) => {
-            if ((e as KeyboardEvent).key === "m") {
-                this.toggleMute();
-            }
-        });
-
-        // Add a pause spot.
-        document.body.addEventListener('keydown', (e) => {
-            if ((e as KeyboardEvent).key === "t") {
-                this.addTimeData(this.video.currentTime);
-            }
-        });
-
-        // Download all pause time information.
-        document.body.addEventListener('keydown', (e) => {
-            if ((e as KeyboardEvent).key === "t") {
-                this.downloadTimeData();
-            }
-        });
     }
 
     private addTimeData(newTime): void {
@@ -246,37 +236,6 @@ export class Window {
 
         // Increment the time index so we don't hit it as soon as we keep going.
         this.timeIndex++;
-    }
-
-    private downloadTimeData(): void {
-
-        // Turn time data into JSON we can use.
-        const serialised = JSON.stringify(this.timeData);
-        
-        // Create file.
-        const downloadJSON = new File(["\ufeff"+serialised], this.videoFile.name.replace(".mp4", "") + ".json", {type: "text/plain:charset=UTF-8"});
-
-        // Create hidden element to download the file.
-        const downloadURL = window.URL.createObjectURL(downloadJSON);
-        const downloadElement = document.createElement("a");
-        downloadElement.href = downloadURL;
-        downloadElement.download = this.videoFile.name.replace(".mp4", "") + ".json";
-        downloadElement.click();
-        window.URL.revokeObjectURL(downloadURL);
-    }
-
-    private skipBack(): void {
-
-        this.video.currentTime -= 1;
-
-        this.recalculateTimeIndex();
-    }
-
-    private skipForward(): void {
-
-        this.video.currentTime += 1;
-
-        this.recalculateTimeIndex();
     }
 
     private recalculateTimeIndex() {
